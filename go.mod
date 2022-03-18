@@ -4,6 +4,9 @@ go 1.18
 
 require (
 	github.com/Asphaltt/go-iproute2 v0.0.0-20220212120947-b21b86853724
+	github.com/alibabacloud-go/alidns-20150109/v2 v2.0.1
+	github.com/alibabacloud-go/darabonba-openapi v0.1.15
+	github.com/alibabacloud-go/tea v1.1.17
 	github.com/dchest/validator v0.0.0-20191217151620-8e45250f2371
 	github.com/ggg17226/aghost-go-base v1.0.1
 	github.com/sirupsen/logrus v1.8.1
@@ -12,12 +15,9 @@ require (
 
 require (
 	github.com/alibabacloud-go/alibabacloud-gateway-spi v0.0.3 // indirect
-	github.com/alibabacloud-go/alidns-20150109/v2 v2.0.1 // indirect
-	github.com/alibabacloud-go/darabonba-openapi v0.1.15 // indirect
 	github.com/alibabacloud-go/debug v0.0.0-20190504072949-9472017b5c68 // indirect
 	github.com/alibabacloud-go/endpoint-util v1.1.1 // indirect
 	github.com/alibabacloud-go/openapi-util v0.0.11 // indirect
-	github.com/alibabacloud-go/tea v1.1.17 // indirect
 	github.com/alibabacloud-go/tea-utils v1.4.4 // indirect
 	github.com/aliyun/credentials-go v1.2.1 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect

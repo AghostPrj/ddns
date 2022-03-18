@@ -8,6 +8,7 @@
 package initializator
 
 import (
+	"github.com/AghostPrj/ddns/internal/global"
 	"github.com/AghostPrj/ddns/internal/utils/aliyunDnsUtils"
 	"github.com/AghostPrj/ddns/internal/utils/ipUtils"
 	"github.com/ggg17226/aghost-go-base/pkg/utils/configUtils"
@@ -16,7 +17,7 @@ import (
 )
 
 func InitApp() {
-	configUtils.SetConfigFileName(ApplicationName)
+	configUtils.SetConfigFileName(global.ApplicationName)
 	bindAppConfigKey()
 	bindAppConfigDefaultValue()
 	configUtils.InitConfigAndLog()
@@ -27,17 +28,17 @@ func InitApp() {
 
 func bindAppConfigKey() {
 	configUtils.ConfigKeyList = append(configUtils.ConfigKeyList,
-		[]string{ConfAliyunTokenIdKey, EnvAliyunTokenIdKey},
-		[]string{ConfAliyunTokenSecretKey, EnvAliyunTokenSecretKey},
-		[]string{ConfAppLoopDelayKey, EnvAppLoopDelayKey},
-		[]string{ConfDomainKey, EnvDomainKey},
-		[]string{ConfSubDomainKey, EnvSubDomainKey},
-		[]string{ConfUpstreamInterfaceNameKey, EnvUpstreamInterfaceNameKey},
+		[]string{global.ConfAliyunTokenIdKey, global.EnvAliyunTokenIdKey},
+		[]string{global.ConfAliyunTokenSecretKey, global.EnvAliyunTokenSecretKey},
+		[]string{global.ConfAppLoopDelayKey, global.EnvAppLoopDelayKey},
+		[]string{global.ConfDomainKey, global.EnvDomainKey},
+		[]string{global.ConfSubDomainKey, global.EnvSubDomainKey},
+		[]string{global.ConfUpstreamInterfaceNameKey, global.EnvUpstreamInterfaceNameKey},
 	)
 }
 func bindAppConfigDefaultValue() {
-	viper.SetDefault(ConfAppLoopDelayKey, DefaultAppLoopDelayKey)
-	viper.SetDefault(ConfUpstreamInterfaceNameKey, DefaultUpstreamInterfaceName)
+	viper.SetDefault(global.ConfAppLoopDelayKey, global.DefaultAppLoopDelayKey)
+	viper.SetDefault(global.ConfUpstreamInterfaceNameKey, global.DefaultUpstreamInterfaceName)
 }
 
 func checkAppConfig() {

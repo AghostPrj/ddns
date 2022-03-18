@@ -8,19 +8,18 @@
 package initializator
 
 import (
-	"github.com/dchest/validator"
-	"github.com/spf13/viper"
+	"github.com/AghostPrj/ddns/internal/global"
 )
 
 func checkAliyunToken() bool {
-	tokenId := viper.GetString(ConfAliyunTokenIdKey)
-	tokenKey := viper.GetString(ConfAliyunTokenSecretKey)
+	tokenId := viper.GetString(global.ConfAliyunTokenIdKey)
+	tokenKey := viper.GetString(global.ConfAliyunTokenSecretKey)
 
 	return len(tokenId) >= 1 && len(tokenKey) >= 1
 }
 func checkDomainConfig() bool {
-	domain := viper.GetString(ConfDomainKey)
-	subDomain := viper.GetString(ConfSubDomainKey)
+	domain := viper.GetString(global.ConfDomainKey)
+	subDomain := viper.GetString(global.ConfSubDomainKey)
 
 	return validator.IsValidDomain(domain) && len(subDomain) >= 1
 }

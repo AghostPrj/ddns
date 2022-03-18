@@ -8,7 +8,7 @@
 package aliyunDnsUtils
 
 import (
-	"github.com/AghostPrj/ddns/internal/initializator"
+	"github.com/AghostPrj/ddns/internal/global"
 	aliDns "github.com/alibabacloud-go/alidns-20150109/v2/client"
 	aliOpenApi "github.com/alibabacloud-go/darabonba-openapi/client"
 	aliTea "github.com/alibabacloud-go/tea/tea"
@@ -21,8 +21,8 @@ var (
 )
 
 func InitAliyunDnsClient() {
-	tokenId := viper.GetString(initializator.ConfAliyunTokenIdKey)
-	tokenSecret := viper.GetString(initializator.ConfAliyunTokenSecretKey)
+	tokenId := viper.GetString(global.ConfAliyunTokenIdKey)
+	tokenSecret := viper.GetString(global.ConfAliyunTokenSecretKey)
 	clientConfig := &aliOpenApi.Config{
 		AccessKeyId:     &tokenId,
 		AccessKeySecret: &tokenSecret,
@@ -37,8 +37,8 @@ func InitAliyunDnsClient() {
 }
 
 func DescribeRecord() {
-	domain := viper.GetString(initializator.ConfDomainKey)
-	subDomain := viper.GetString(initializator.ConfSubDomainKey)
+	domain := viper.GetString(global.ConfDomainKey)
+	subDomain := viper.GetString(global.ConfSubDomainKey)
 	req := aliDns.DescribeDomainRecordsRequest{
 		DomainName: &domain,
 		RRKeyWord:  &subDomain,

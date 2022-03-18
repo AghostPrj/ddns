@@ -5,7 +5,7 @@
  * @Desc:
  */
 
-package initializator
+package global
 
 const (
 	ApplicationName = "ddns"
