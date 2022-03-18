@@ -1,4 +1,9 @@
-build : clean amd64 arm64
+build : getDep clean amd64 arm64
+
+getDep:
+	go get -v -t -d ./...
+
+
 clean :
 	rm -rf target; go clean
 
