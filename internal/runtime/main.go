@@ -8,7 +8,8 @@
 package runtime
 
 import (
-	"github.com/AghostPrj/ddns/internal/initializator"
+	"github.com/AghostPrj/ddns/internal/global"
+	"github.com/AghostPrj/ddns/internal/utils/aliyunDnsUtils"
 	"github.com/AghostPrj/ddns/internal/utils/ipUtils"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -17,19 +18,64 @@ import (
 
 func MainLoop() {
 	for {
-		result, err := ipUtils.GetLocalIpByInterfaceName(viper.GetString(initializator.ConfUpstreamInterfaceNameKey))
-		result = &ipUtils.IpAddrPayload{
-			V4: make([]string, 1),
-			V6: make([]string, 1),
-		}
-		err = nil
-		result.V6[0] = "240e:368:c0f:cf60:a84a:17fa:ba4a:fbe5"
-		result.V4[0] = "59.172.116.189"
+		localIpAddr, err := ipUtils.GetLocalIpByInterfaceName(viper.GetString(global.ConfUpstreamInterfaceNameKey))
 		if err != nil {
 			log.WithField("err", err).Error()
 		} else {
-			log.WithField("data", result).Info()
+			log.WithField("data", localIpAddr).WithField("op", "get local addr").Debug()
+			record, err := aliyunDnsUtils.DescribeRecord()
+			if err != nil {
+				log.WithField("op", "describe dns record").WithField("err", err).Error()
+			} else {
+				ipv6Addr := ""
+				if len(localIpAddr.V4) > 0 {
+					domainRecordType := global.DomainTypeIpv4Direct
+					ipv6Addr = "::ffff:" + localIpAddr.V4[0]
+					if record.Ipv4 != nil {
+						if record.Ipv4.Value != localIpAddr.V4[0] {
+							err := aliyunDnsUtils.UpdateDomainRecord(&record.Ipv4.RecordId, &domainRecordType, &localIpAddr.V4[0])
+							if err != nil {
+								log.WithField("op", "update ipv4 domain record").WithField("err", err).Error()
+							} else {
+								log.WithField("op", "update ipv4 domain record").WithField("value", localIpAddr.V4[0]).Info()
+							}
+						}
+					} else {
+						err := aliyunDnsUtils.AddDomainRecord(&domainRecordType, &localIpAddr.V4[0])
+						if err != nil {
+							log.WithField("op", "add ipv4 domain record").WithField("err", err).Error()
+						} else {
+							log.WithField("op", "add ipv4 domain record").WithField("value", localIpAddr.V4[0]).Info()
+						}
+					}
+				}
+
+				if len(localIpAddr.V6) > 0 {
+					ipv6Addr = localIpAddr.V6[0]
+				}
+
+				if len(ipv6Addr) > 0 {
+					domainRecordType := global.DomainTypeIpv6Direct
+					if record.Ipv6 != nil {
+						if record.Ipv6.Value != ipv6Addr {
+							err := aliyunDnsUtils.UpdateDomainRecord(&record.Ipv6.RecordId, &domainRecordType, &ipv6Addr)
+							if err != nil {
+								log.WithField("op", "update ipv6 domain record").WithField("err", err).Error()
+							} else {
+								log.WithField("op", "update ipv6 domain record").WithField("value", ipv6Addr).Info()
+							}
+						}
+					} else {
+						err := aliyunDnsUtils.AddDomainRecord(&domainRecordType, &ipv6Addr)
+						if err != nil {
+							log.WithField("op", "add ipv6 domain record").WithField("err", err).Error()
+						} else {
+							log.WithField("op", "add ipv6 domain record").WithField("value", ipv6Addr).Info()
+						}
+					}
+				}
+			}
 		}
-		time.Sleep(time.Second * viper.GetDuration(initializator.ConfAppLoopDelayKey))
+		time.Sleep(time.Second * viper.GetDuration(global.ConfAppLoopDelayKey))
 	}
 }

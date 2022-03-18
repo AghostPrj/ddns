@@ -29,4 +29,7 @@ const (
 	ConfUpstreamInterfaceNameKey = "app.interface.name"
 	EnvUpstreamInterfaceNameKey  = "app_interface_name"
 	DefaultUpstreamInterfaceName = "pppoe-wan"
+
+	DomainTypeIpv4Direct = "A"
+	DomainTypeIpv6Direct = "AAAA"
 )

@@ -9,6 +9,8 @@ package initializator
 
 import (
 	"github.com/AghostPrj/ddns/internal/global"
+	"github.com/dchest/validator"
+	"github.com/spf13/viper"
 )
 
 func checkAliyunToken() bool {

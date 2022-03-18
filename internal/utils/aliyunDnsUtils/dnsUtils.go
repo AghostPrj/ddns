@@ -36,12 +36,75 @@ func InitAliyunDnsClient() {
 	conn = c
 }
 
-func DescribeRecord() {
+func DescribeRecord() (*DomainRecordPayload, error) {
 	domain := viper.GetString(global.ConfDomainKey)
 	subDomain := viper.GetString(global.ConfSubDomainKey)
 	req := aliDns.DescribeDomainRecordsRequest{
 		DomainName: &domain,
 		RRKeyWord:  &subDomain,
 	}
-	conn.DescribeDomainRecords()
+	records, err := conn.DescribeDomainRecords(&req)
+	if err != nil {
+		log.WithField("op", "describe domain record").WithField("err", err).Debug()
+		return nil, err
+	}
+	result := DomainRecordPayload{}
+
+	if *records.Body.TotalCount >= 0 {
+		for _, record := range records.Body.DomainRecords.Record {
+			switch *record.Type {
+			case global.DomainTypeIpv4Direct:
+				result.Ipv4 = &DomainRecordInfo{
+					Status:   *record.Status == "ENABLE",
+					TTL:      *record.TTL,
+					RecordId: *record.RecordId,
+					Value:    *record.Value,
+				}
+				break
+			case global.DomainTypeIpv6Direct:
+				result.Ipv6 = &DomainRecordInfo{
+					Status:   *record.Status == "ENABLE",
+					TTL:      *record.TTL,
+					RecordId: *record.RecordId,
+					Value:    *record.Value,
+				}
+				break
+			default:
+				break
+			}
+		}
+	}
+
+	return &result, nil
+}
+
+func UpdateDomainRecord(recordId, recordType, value *string) error {
+	subDomain := viper.GetString(global.ConfSubDomainKey)
+
+	req := aliDns.UpdateDomainRecordRequest{RecordId: recordId, RR: &subDomain, Type: recordType, Value: value}
+	_, err := conn.UpdateDomainRecord(&req)
+	if err != nil {
+		log.WithField("op", "update dns record").WithField("err", err).Debug()
+		return err
+	}
+	return err
+
+}
+
+func AddDomainRecord(domainType, value *string) error {
+	subDomain := viper.GetString(global.ConfSubDomainKey)
+	domain := viper.GetString(global.ConfDomainKey)
+
+	req := aliDns.AddDomainRecordRequest{
+		DomainName: &domain,
+		RR:         &subDomain,
+		Type:       domainType,
+		Value:      value,
+	}
+	_, err := conn.AddDomainRecord(&req)
+	if err != nil {
+		log.WithField("op", "add dns record").WithField("err", err).Debug()
+		return err
+	}
+	return err
 }
