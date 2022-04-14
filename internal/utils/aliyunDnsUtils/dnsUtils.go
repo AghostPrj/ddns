@@ -9,6 +9,7 @@ package aliyunDnsUtils
 
 import (
 	"github.com/AghostPrj/ddns/internal/global"
+	"github.com/AghostPrj/ddns/internal/utils/dnsUtils"
 	aliDns "github.com/alibabacloud-go/alidns-20150109/v2/client"
 	aliOpenApi "github.com/alibabacloud-go/darabonba-openapi/client"
 	aliTea "github.com/alibabacloud-go/tea/tea"
@@ -20,7 +21,7 @@ var (
 	conn *aliDns.Client
 )
 
-func InitAliyunDnsClient() {
+func InitDnsClient() {
 	tokenId := viper.GetString(global.ConfAliyunTokenIdKey)
 	tokenSecret := viper.GetString(global.ConfAliyunTokenSecretKey)
 	clientConfig := &aliOpenApi.Config{
@@ -36,7 +37,7 @@ func InitAliyunDnsClient() {
 	conn = c
 }
 
-func DescribeRecord() (*DomainRecordPayload, error) {
+func DescribeRecord() (*dnsUtils.DomainRecordPayload, error) {
 	domain := viper.GetString(global.ConfDomainKey)
 	subDomain := viper.GetString(global.ConfSubDomainKey)
 	req := aliDns.DescribeDomainRecordsRequest{
@@ -48,13 +49,13 @@ func DescribeRecord() (*DomainRecordPayload, error) {
 		log.WithField("op", "describe domain record").WithField("err", err).Debug()
 		return nil, err
 	}
-	result := DomainRecordPayload{}
+	result := dnsUtils.DomainRecordPayload{}
 
 	if *records.Body.TotalCount >= 0 {
 		for _, record := range records.Body.DomainRecords.Record {
 			switch *record.Type {
 			case global.DomainTypeIpv4Direct:
-				result.Ipv4 = &DomainRecordInfo{
+				result.Ipv4 = &dnsUtils.DomainRecordInfo{
 					Status:   *record.Status == "ENABLE",
 					TTL:      *record.TTL,
 					RecordId: *record.RecordId,
@@ -62,7 +63,7 @@ func DescribeRecord() (*DomainRecordPayload, error) {
 				}
 				break
 			case global.DomainTypeIpv6Direct:
-				result.Ipv6 = &DomainRecordInfo{
+				result.Ipv6 = &dnsUtils.DomainRecordInfo{
 					Status:   *record.Status == "ENABLE",
 					TTL:      *record.TTL,
 					RecordId: *record.RecordId,

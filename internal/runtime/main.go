@@ -9,7 +9,6 @@ package runtime
 
 import (
 	"github.com/AghostPrj/ddns/internal/global"
-	"github.com/AghostPrj/ddns/internal/utils/aliyunDnsUtils"
 	"github.com/AghostPrj/ddns/internal/utils/ipUtils"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -23,7 +22,9 @@ func MainLoop() {
 			log.WithField("err", err).Error()
 		} else {
 			log.WithField("data", localIpAddr).WithField("op", "get local addr").Debug()
-			record, err := aliyunDnsUtils.DescribeRecord()
+
+			record, err := global.DescribeRecordFunction()
+
 			if err != nil {
 				log.WithField("op", "describe dns record").WithField("err", err).Error()
 			} else {
@@ -33,7 +34,7 @@ func MainLoop() {
 					ipv6Addr = "::ffff:" + localIpAddr.V4[0]
 					if record.Ipv4 != nil {
 						if record.Ipv4.Value != localIpAddr.V4[0] {
-							err := aliyunDnsUtils.UpdateDomainRecord(&record.Ipv4.RecordId, &domainRecordType, &localIpAddr.V4[0])
+							err := global.UpdateDomainRecordFunction(&record.Ipv4.RecordId, &domainRecordType, &localIpAddr.V4[0])
 							if err != nil {
 								log.WithField("op", "update ipv4 domain record").WithField("err", err).Error()
 							} else {
@@ -41,7 +42,7 @@ func MainLoop() {
 							}
 						}
 					} else {
-						err := aliyunDnsUtils.AddDomainRecord(&domainRecordType, &localIpAddr.V4[0])
+						err := global.AddDomainRecordFunction(&domainRecordType, &localIpAddr.V4[0])
 						if err != nil {
 							log.WithField("op", "add ipv4 domain record").WithField("err", err).Error()
 						} else {
@@ -58,7 +59,7 @@ func MainLoop() {
 					domainRecordType := global.DomainTypeIpv6Direct
 					if record.Ipv6 != nil {
 						if record.Ipv6.Value != ipv6Addr {
-							err := aliyunDnsUtils.UpdateDomainRecord(&record.Ipv6.RecordId, &domainRecordType, &ipv6Addr)
+							err := global.UpdateDomainRecordFunction(&record.Ipv6.RecordId, &domainRecordType, &ipv6Addr)
 							if err != nil {
 								log.WithField("op", "update ipv6 domain record").WithField("err", err).Error()
 							} else {
@@ -66,7 +67,7 @@ func MainLoop() {
 							}
 						}
 					} else {
-						err := aliyunDnsUtils.AddDomainRecord(&domainRecordType, &ipv6Addr)
+						err := global.AddDomainRecordFunction(&domainRecordType, &ipv6Addr)
 						if err != nil {
 							log.WithField("op", "add ipv6 domain record").WithField("err", err).Error()
 						} else {

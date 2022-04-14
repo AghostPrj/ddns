@@ -13,11 +13,34 @@ import (
 	"github.com/spf13/viper"
 )
 
+func checkDomainServiceProviderConf() bool {
+	provider := viper.GetString(global.ConfDomainServiceProvider)
+
+	if len(provider) < 1 {
+		return false
+	}
+
+	switch provider {
+	case global.DomainServiceProviderAliyun:
+		return checkAliyunToken()
+	case global.DomainServiceProviderDnspod:
+		return checkDnsPodToken()
+	default:
+		return false
+	}
+}
+
+func checkDnsPodToken() bool {
+	tokenSecret := viper.GetString(global.ConfDnspodTokenSecretKey)
+
+	return len(tokenSecret) >= 1
+}
+
 func checkAliyunToken() bool {
 	tokenId := viper.GetString(global.ConfAliyunTokenIdKey)
-	tokenKey := viper.GetString(global.ConfAliyunTokenSecretKey)
+	tokenSecret := viper.GetString(global.ConfAliyunTokenSecretKey)
 
-	return len(tokenId) >= 1 && len(tokenKey) >= 1
+	return len(tokenId) >= 1 && len(tokenSecret) >= 1
 }
 func checkDomainConfig() bool {
 	domain := viper.GetString(global.ConfDomainKey)

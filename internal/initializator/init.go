@@ -10,6 +10,7 @@ package initializator
 import (
 	"github.com/AghostPrj/ddns/internal/global"
 	"github.com/AghostPrj/ddns/internal/utils/aliyunDnsUtils"
+	"github.com/AghostPrj/ddns/internal/utils/dnspodUtils"
 	"github.com/AghostPrj/ddns/internal/utils/ipUtils"
 	"github.com/ggg17226/aghost-go-base/pkg/utils/configUtils"
 	log "github.com/sirupsen/logrus"
@@ -23,11 +24,27 @@ func InitApp() {
 	configUtils.InitConfigAndLog()
 	checkAppConfig()
 	ipUtils.InitNetLinkConn()
-	aliyunDnsUtils.InitAliyunDnsClient()
+	switch viper.GetString(global.ConfDomainServiceProvider) {
+	case global.DomainServiceProviderAliyun:
+		aliyunDnsUtils.InitDnsClient()
+		global.DescribeRecordFunction = aliyunDnsUtils.DescribeRecord
+		global.UpdateDomainRecordFunction = aliyunDnsUtils.UpdateDomainRecord
+		global.AddDomainRecordFunction = aliyunDnsUtils.AddDomainRecord
+		break
+	case global.DomainServiceProviderDnspod:
+		dnspodUtils.InitDnsClient()
+		global.DescribeRecordFunction = dnspodUtils.DescribeRecord
+		global.AddDomainRecordFunction = dnspodUtils.AddDomainRecord
+		global.UpdateDomainRecordFunction = dnspodUtils.UpdateDomainRecord
+
+		break
+	}
 }
 
 func bindAppConfigKey() {
 	configUtils.ConfigKeyList = append(configUtils.ConfigKeyList,
+		[]string{global.ConfDomainServiceProvider, global.EnvDomainServiceProvider},
+		[]string{global.ConfDnspodTokenSecretKey, global.EnvDnspodTokenSecretKey},
 		[]string{global.ConfAliyunTokenIdKey, global.EnvAliyunTokenIdKey},
 		[]string{global.ConfAliyunTokenSecretKey, global.EnvAliyunTokenSecretKey},
 		[]string{global.ConfAppLoopDelayKey, global.EnvAppLoopDelayKey},
@@ -42,8 +59,8 @@ func bindAppConfigDefaultValue() {
 }
 
 func checkAppConfig() {
-	if !checkAliyunToken() {
-		log.WithField("err", "aliyun token error").
+	if !checkDomainServiceProviderConf() {
+		log.WithField("err", "domain provider config error").
 			WithField("op", "init").
 			Panic("config error")
 	}

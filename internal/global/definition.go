@@ -7,6 +7,13 @@
 
 package global
 
+import "github.com/AghostPrj/ddns/internal/utils/dnsUtils"
+
+const (
+	DomainServiceProviderAliyun = "aliyun"
+	DomainServiceProviderDnspod = "dnspod"
+)
+
 const (
 	ApplicationName = "ddns"
 
@@ -14,11 +21,17 @@ const (
 	EnvAppLoopDelayKey     = "app_loop_delay"
 	DefaultAppLoopDelayKey = 60
 
-	ConfAliyunTokenIdKey = "app.token.aliyun.token.id"
-	EnvAliyunTokenIdKey  = "app_token_aliyun_token_id"
+	ConfDomainServiceProvider = "app.domain.provider"
+	EnvDomainServiceProvider  = "app_domain_provider"
 
-	ConfAliyunTokenSecretKey = "app.token.aliyun.token.secret"
-	EnvAliyunTokenSecretKey  = "app_token_aliyun_token_secret"
+	ConfDnspodTokenSecretKey = "app.token.dnspod.secret"
+	EnvDnspodTokenSecretKey  = "app_token_dnspod_secret"
+
+	ConfAliyunTokenIdKey = "app.token.aliyun.id"
+	EnvAliyunTokenIdKey  = "app_token_aliyun_id"
+
+	ConfAliyunTokenSecretKey = "app.token.aliyun.secret"
+	EnvAliyunTokenSecretKey  = "app_token_aliyun_secret"
 
 	ConfDomainKey = "app.domain"
 	EnvDomainKey  = "app_domain"
@@ -32,4 +45,10 @@ const (
 
 	DomainTypeIpv4Direct = "A"
 	DomainTypeIpv6Direct = "AAAA"
+)
+
+var (
+	DescribeRecordFunction     func() (*dnsUtils.DomainRecordPayload, error)
+	UpdateDomainRecordFunction func(*string, *string, *string) error
+	AddDomainRecordFunction    func(*string, *string) error
 )

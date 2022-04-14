@@ -5,7 +5,7 @@
  * @Desc:
  */
 
-package aliyunDnsUtils
+package dnsUtils
 
 type DomainRecordPayload struct {
 	Ipv4 *DomainRecordInfo
