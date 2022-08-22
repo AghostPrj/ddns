@@ -16,8 +16,23 @@ import (
 )
 
 func MainLoop() {
+
+	var localIpAddr *ipUtils.IpAddrPayload
+	var err error
+
 	for {
-		localIpAddr, err := ipUtils.GetLocalIpByInterfaceName(viper.GetString(global.ConfUpstreamInterfaceNameKey))
+
+		switch viper.GetString(global.ConfPublicIpSourceKey) {
+		case global.PublicIpSourceIpLookupService:
+			localIpAddr, err = ipUtils.GetLocalIpByRemoteService()
+			break
+		case global.PublicIpSourceInterface:
+			localIpAddr, err = ipUtils.GetLocalIpByInterfaceName(viper.GetString(global.ConfUpstreamInterfaceNameKey))
+			break
+		default:
+			log.WithField("err", "ip source error").Panic()
+		}
+
 		if err != nil {
 			log.WithField("err", err).Error()
 		} else {

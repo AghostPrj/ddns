@@ -48,3 +48,10 @@ func checkDomainConfig() bool {
 
 	return validator.IsValidDomain(domain) && len(subDomain) >= 1
 }
+func checkIpSource() bool {
+	publicIpSource := viper.GetString(global.ConfPublicIpSourceKey)
+
+	return publicIpSource == global.PublicIpSourceInterface ||
+		publicIpSource == global.PublicIpSourceIpLookupService
+
+}

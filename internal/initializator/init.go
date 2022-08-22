@@ -51,11 +51,13 @@ func bindAppConfigKey() {
 		[]string{global.ConfDomainKey, global.EnvDomainKey},
 		[]string{global.ConfSubDomainKey, global.EnvSubDomainKey},
 		[]string{global.ConfUpstreamInterfaceNameKey, global.EnvUpstreamInterfaceNameKey},
+		[]string{global.ConfPublicIpSourceKey, global.EnvPublicIpSourceKey},
 	)
 }
 func bindAppConfigDefaultValue() {
 	viper.SetDefault(global.ConfAppLoopDelayKey, global.DefaultAppLoopDelayKey)
 	viper.SetDefault(global.ConfUpstreamInterfaceNameKey, global.DefaultUpstreamInterfaceName)
+	viper.SetDefault(global.ConfPublicIpSourceKey, global.DefaultPublicIpSource)
 }
 
 func checkAppConfig() {
@@ -67,6 +69,12 @@ func checkAppConfig() {
 
 	if !checkDomainConfig() {
 		log.WithField("err", "domain error").
+			WithField("op", "init").
+			Panic("config error")
+	}
+
+	if !checkIpSource() {
+		log.WithField("err", "ip source error").
 			WithField("op", "init").
 			Panic("config error")
 	}

@@ -12,10 +12,17 @@ import "github.com/AghostPrj/ddns/internal/utils/dnsUtils"
 const (
 	DomainServiceProviderAliyun = "aliyun"
 	DomainServiceProviderDnspod = "dnspod"
+
+	PublicIpSourceInterface       = "interface"
+	PublicIpSourceIpLookupService = "lookup_service"
 )
 
 const (
 	ApplicationName = "ddns"
+
+	ConfPublicIpSourceKey = "app.ip.source"
+	EnvPublicIpSourceKey  = "app_ip_source"
+	DefaultPublicIpSource = PublicIpSourceInterface
 
 	ConfAppLoopDelayKey    = "app.loop.delay"
 	EnvAppLoopDelayKey     = "app_loop_delay"
