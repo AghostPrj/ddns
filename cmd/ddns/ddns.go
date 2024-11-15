@@ -9,9 +9,11 @@ package main
 import (
 	"github.com/AghostPrj/ddns/internal/initializator"
 	"github.com/AghostPrj/ddns/internal/runtime"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
 	initializator.InitApp()
+	log.Info("start app")
 	runtime.MainLoop()
 }

@@ -19,6 +19,29 @@ import (
 	"time"
 )
 
+const (
+	bilibiliApiAddr = "https://api.bilibili.com/x/web-interface/zone"
+)
+
+type BilibiliAddrServiceResultPayload struct {
+	Code    int64                      `json:"code"`
+	Message string                     `json:"message"`
+	Ttl     int64                      `json:"ttl"`
+	Data    *BilibiliIpAddrAndZoneData `json:"data"`
+}
+
+type BilibiliIpAddrAndZoneData struct {
+	Addr        *string  `json:"addr"`
+	Country     *string  `json:"country"`
+	Province    *string  `json:"province"`
+	City        *string  `json:"city"`
+	Isp         *string  `json:"isp"`
+	Latitude    *float64 `json:"latitude"`
+	Longitude   *float64 `json:"longitude"`
+	ZoneId      *int64   `json:"zone_id"`
+	CountryCode *int64   `json:"country_code"`
+}
+
 type AddrServiceResultPayload struct {
 	SourceIp string `json:"source_ip"`
 }
@@ -37,14 +60,14 @@ func InitNetLinkConn() {
 }
 
 func GetLocalIpByRemoteService() (*IpAddrPayload, error) {
-	ip, err := getLocalV4IpByRemoteService()
+	ipAddr, err := getLocalV4IpByRemoteService()
 	if err != nil {
 		return nil, err
 	}
 
 	result := IpAddrPayload{}
 	result.V4 = make([]string, 1)
-	result.V4[0] = ip
+	result.V4[0] = ipAddr
 	result.V6 = make([]string, 0)
 
 	return &result, nil
@@ -64,7 +87,7 @@ func getLocalV4IpByRemoteService() (string, error) {
 		Timeout:   15 * time.Second,
 	}
 
-	resp, err := httpClient.Get("https://addr.agh0st.com")
+	resp, err := httpClient.Get(bilibiliApiAddr)
 
 	if err != nil {
 		return "", err
@@ -79,14 +102,26 @@ func getLocalV4IpByRemoteService() (string, error) {
 		return "", err
 	}
 
-	payload := AddrServiceResultPayload{}
+	payload := BilibiliAddrServiceResultPayload{}
 
 	err = json.Unmarshal(bodyBytes, &payload)
 	if err != nil {
 		return "", err
 	}
 
-	return payload.SourceIp, nil
+	if payload.Code != 0 {
+		return "", errors.New(payload.Message)
+	}
+
+	if payload.Data == nil {
+		return "", errors.New("no data")
+	}
+
+	if payload.Data.Addr == nil {
+		return "", errors.New("no addr")
+	}
+
+	return *payload.Data.Addr, nil
 }
 
 func GetLocalIpByInterfaceName(interfaceName string) (*IpAddrPayload, error) {
